@@ -28,19 +28,22 @@
       <meta-data android:name="android.view.im" android:resource="@xml/method"/>
     </service>
 
-    <activity android:name=".MorseIMESettings" android:label="@string/morse_ime_settings">
+    <activity android:name=".MorseSettings" android:label="@string/morse_ime_settings">
       <intent-filter>
         <action android:name="android.intent.action.MAIN"/>
       </intent-filter>
     </activity>
 
-    <activity android:name=".MorseIMEMain"
-              android:label="@string/app_name">
+    <activity android:name=".FrontDoor" android:label="@string/app_name">
         <intent-filter>
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.LAUNCHER" />
         </intent-filter>
     </activity>
+    
+    <activity android:name=".HelpActivity" android:label="@string/app_name"/>
+    <activity android:name=".PracticeActivity" android:label="@string/morse_practice_name"/>
+    <activity android:name=".PracticeSettings" android:label="@string/morse_practice_settings"/>
 
   </application>
 

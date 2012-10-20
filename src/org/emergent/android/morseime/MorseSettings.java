@@ -1,12 +1,12 @@
 /*
  * Copyright (C) 2008-2009 Google Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -23,7 +23,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceGroup;
 import android.text.AutoText;
 
-public class MorseIMESettings extends PreferenceActivity
+public class MorseSettings extends PreferenceActivity
     implements SharedPreferences.OnSharedPreferenceChangeListener {
 
   private static final String QUICK_FIXES_KEY = "quick_fixes";
@@ -36,11 +36,10 @@ public class MorseIMESettings extends PreferenceActivity
   @Override
   protected void onCreate(Bundle icicle) {
     super.onCreate(icicle);
-    addPreferencesFromResource(R.xml.prefs);
+    addPreferencesFromResource(R.xml.prefs_morse);
     mQuickFixes = (CheckBoxPreference) findPreference(QUICK_FIXES_KEY);
     mShowSuggestions = (CheckBoxPreference) findPreference(SHOW_SUGGESTIONS_KEY);
-    getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener(
-        this);
+    getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
   }
 
   @Override
@@ -48,8 +47,7 @@ public class MorseIMESettings extends PreferenceActivity
     super.onResume();
     int autoTextSize = AutoText.getSize(getListView());
     if (autoTextSize < 1) {
-      ((PreferenceGroup) findPreference(PREDICTION_SETTINGS_KEY))
-          .removePreference(mQuickFixes);
+      ((PreferenceGroup) findPreference(PREDICTION_SETTINGS_KEY)).removePreference(mQuickFixes);
     } else {
       mShowSuggestions.setDependency(QUICK_FIXES_KEY);
     }
@@ -57,8 +55,7 @@ public class MorseIMESettings extends PreferenceActivity
 
   @Override
   protected void onDestroy() {
-    getPreferenceManager().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(
-        this);
+    getPreferenceManager().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
     super.onDestroy();
   }
 

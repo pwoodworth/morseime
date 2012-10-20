@@ -1,12 +1,12 @@
 /*
  * Copyright (C) 2008-2009 Google Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -17,36 +17,23 @@
 package org.emergent.android.morseime;
 
 import android.app.AlertDialog;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
+import android.content.*;
 import android.content.res.Configuration;
 import android.inputmethodservice.InputMethodService;
 import android.inputmethodservice.Keyboard;
 import android.inputmethodservice.KeyboardView;
 import android.media.AudioManager;
-import android.os.Debug;
-import android.os.Handler;
-import android.os.Message;
-import android.os.SystemClock;
-import android.os.Vibrator;
+import android.os.*;
 import android.preference.PreferenceManager;
 import android.text.AutoText;
-import android.text.ClipboardManager;
 import android.text.TextUtils;
 import android.util.PrintWriterPrinter;
 import android.util.Printer;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.view.inputmethod.CompletionInfo;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
-import android.view.inputmethod.InputMethodManager;
 
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
@@ -58,18 +45,10 @@ import java.util.List;
  */
 public class LatinIME extends InputMethodService
     implements KeyboardView.OnKeyboardActionListener {
-  static final boolean DEBUG = false;
+
   static final boolean TRACE = false;
 
-  private static final String PREF_VIBRATE_ON = "vibrate_on";
-  private static final String PREF_SOUND_ON = "sound_on";
-  private static final String PREF_AUTO_CAP = "auto_cap";
-  private static final String PREF_QUICK_FIXES = "quick_fixes";
-  private static final String PREF_SHOW_SUGGESTIONS = "show_suggestions";
-  private static final String PREF_AUTO_COMPLETE = "auto_complete";
-
   private static final int MSG_UPDATE_SUGGESTIONS = 0;
-  private static final int MSG_START_TUTORIAL = 1;
   private static final int MSG_UPDATE_SHIFT_STATE = 2;
 
   // How many continuous deletes at which to start deleting at a higher speed.
@@ -97,7 +76,7 @@ public class LatinIME extends InputMethodService
   private Suggest mSuggest;
   private CompletionInfo[] mCompletions;
 
-  private AlertDialog mOptionsDialog;
+  protected AlertDialog mOptionsDialog;
 
   KeyboardSwitcher mKeyboardSwitcher;
 
@@ -131,8 +110,6 @@ public class LatinIME extends InputMethodService
   private int mDeleteCount;
   private long mLastKeyTime;
 
-  private Tutorial mTutorial;
-
   private Vibrator mVibrator;
   private long mVibrateDuration;
 
@@ -150,17 +127,6 @@ public class LatinIME extends InputMethodService
       switch (msg.what) {
         case MSG_UPDATE_SUGGESTIONS:
           updateSuggestions();
-          break;
-        case MSG_START_TUTORIAL:
-          if (mTutorial == null) {
-            if (mInputView.isShown()) {
-              mTutorial = new Tutorial(LatinIME.this, mInputView);
-              mTutorial.start();
-            } else {
-              // Try again soon if the view is not yet showing
-              sendMessageDelayed(obtainMessage(MSG_START_TUTORIAL), 100);
-            }
-          }
           break;
         case MSG_UPDATE_SHIFT_STATE:
           updateShiftKeyState(getCurrentInputEditorInfo());
@@ -226,8 +192,7 @@ public class LatinIME extends InputMethodService
 
   @Override
   public View onCreateInputView() {
-    mInputView = (MorseKeyboardView) getLayoutInflater().inflate(
-        R.layout.input, null);
+    mInputView = (MorseKeyboardView) getLayoutInflater().inflate(R.layout.input, null);
     mKeyboardSwitcher.setInputView(mInputView);
     mKeyboardSwitcher.makeKeyboards(true);
     mInputView.setOnKeyboardActionListener(this);
@@ -238,8 +203,7 @@ public class LatinIME extends InputMethodService
   @Override
   public View onCreateCandidatesView() {
     mKeyboardSwitcher.makeKeyboards(true);
-    mCandidateViewContainer = (CandidateViewContainer) getLayoutInflater().inflate(
-        R.layout.candidates, null);
+    mCandidateViewContainer = (CandidateViewContainer) getLayoutInflater().inflate(R.layout.candidates, null);
     mCandidateViewContainer.initViews();
     mCandidateView = (CandidateView) mCandidateViewContainer.findViewById(R.id.candidates);
     mCandidateView.setService(this);
@@ -266,16 +230,13 @@ public class LatinIME extends InputMethodService
     switch (attribute.inputType & EditorInfo.TYPE_MASK_CLASS) {
       case EditorInfo.TYPE_CLASS_NUMBER:
       case EditorInfo.TYPE_CLASS_DATETIME:
-        mKeyboardSwitcher.setKeyboardMode(KeyboardSwitcher.MODE_SYMBOLS,
-            attribute.imeOptions);
+        mKeyboardSwitcher.setKeyboardMode(KeyboardSwitcher.MODE_SYMBOLS, attribute.imeOptions);
         break;
       case EditorInfo.TYPE_CLASS_PHONE:
-        mKeyboardSwitcher.setKeyboardMode(KeyboardSwitcher.MODE_PHONE,
-            attribute.imeOptions);
+        mKeyboardSwitcher.setKeyboardMode(KeyboardSwitcher.MODE_PHONE, attribute.imeOptions);
         break;
       case EditorInfo.TYPE_CLASS_TEXT:
-        mKeyboardSwitcher.setKeyboardMode(KeyboardSwitcher.MODE_TEXT,
-            attribute.imeOptions);
+        mKeyboardSwitcher.setKeyboardMode(KeyboardSwitcher.MODE_TEXT, attribute.imeOptions);
         //startPrediction();
         mPredictionOn = true;
         // Make sure that passwords are not displayed in candidate view
@@ -292,15 +253,12 @@ public class LatinIME extends InputMethodService
         }
         if (variation == EditorInfo.TYPE_TEXT_VARIATION_EMAIL_ADDRESS) {
           mPredictionOn = false;
-          mKeyboardSwitcher.setKeyboardMode(KeyboardSwitcher.MODE_EMAIL,
-              attribute.imeOptions);
+          mKeyboardSwitcher.setKeyboardMode(KeyboardSwitcher.MODE_EMAIL, attribute.imeOptions);
         } else if (variation == EditorInfo.TYPE_TEXT_VARIATION_URI) {
           mPredictionOn = false;
-          mKeyboardSwitcher.setKeyboardMode(KeyboardSwitcher.MODE_URL,
-              attribute.imeOptions);
+          mKeyboardSwitcher.setKeyboardMode(KeyboardSwitcher.MODE_URL, attribute.imeOptions);
         } else if (variation == EditorInfo.TYPE_TEXT_VARIATION_SHORT_MESSAGE) {
-          mKeyboardSwitcher.setKeyboardMode(KeyboardSwitcher.MODE_IM,
-              attribute.imeOptions);
+          mKeyboardSwitcher.setKeyboardMode(KeyboardSwitcher.MODE_IM, attribute.imeOptions);
         } else if (variation == EditorInfo.TYPE_TEXT_VARIATION_FILTER) {
           mPredictionOn = false;
         } else if (variation == EditorInfo.TYPE_TEXT_VARIATION_WEB_EDIT_TEXT) {
@@ -328,8 +286,7 @@ public class LatinIME extends InputMethodService
         updateShiftKeyState(attribute);
         break;
       default:
-        mKeyboardSwitcher.setKeyboardMode(KeyboardSwitcher.MODE_TEXT,
-            attribute.imeOptions);
+        mKeyboardSwitcher.setKeyboardMode(KeyboardSwitcher.MODE_TEXT, attribute.imeOptions);
         updateShiftKeyState(attribute);
     }
     mInputView.closing();
@@ -351,7 +308,6 @@ public class LatinIME extends InputMethodService
       mSuggest.setCorrectionMode(mCorrectionMode);
     }
     mPredictionOn = mPredictionOn && mCorrectionMode > 0;
-    checkTutorial(attribute.privateImeOptions);
     if (TRACE) Debug.startMethodTracing("/data/trace/morseime");
   }
 
@@ -395,10 +351,6 @@ public class LatinIME extends InputMethodService
     if (mOptionsDialog != null && mOptionsDialog.isShowing()) {
       mOptionsDialog.dismiss();
       mOptionsDialog = null;
-    }
-    if (mTutorial != null) {
-      mTutorial.close();
-      mTutorial = null;
     }
     super.hideWindow();
     TextEntryState.endSession();
@@ -454,9 +406,6 @@ public class LatinIME extends InputMethodService
         if (event.getRepeatCount() == 0 && mInputView != null) {
           if (mInputView.handleBack()) {
             return true;
-          } else if (mTutorial != null) {
-            mTutorial.close();
-            mTutorial = null;
           }
         }
         break;
@@ -465,9 +414,9 @@ public class LatinIME extends InputMethodService
       case KeyEvent.KEYCODE_DPAD_LEFT:
       case KeyEvent.KEYCODE_DPAD_RIGHT:
         // If tutorial is visible, don't allow dpad to work
-        if (mTutorial != null) {
-          return true;
-        }
+//        if (mTutorial != null) {
+//          return true;
+//        }
         break;
     }
     return super.onKeyDown(keyCode, event);
@@ -481,9 +430,9 @@ public class LatinIME extends InputMethodService
       case KeyEvent.KEYCODE_DPAD_LEFT:
       case KeyEvent.KEYCODE_DPAD_RIGHT:
         // If tutorial is visible, don't allow dpad to work
-        if (mTutorial != null) {
-          return true;
-        }
+//        if (mTutorial != null) {
+//          return true;
+//        }
         // Enable shift key and DPAD to do selections
         if (mInputView != null && mInputView.isShown() && mInputView.isShifted()) {
           event = new KeyEvent(event.getDownTime(), event.getEventTime(),
@@ -991,16 +940,16 @@ public class LatinIME extends InputMethodService
 
   // update flags for silent mode
 
-  private void updateRingerMode() {
+  protected void updateRingerMode() {
     if (mAudioManager == null) {
-      mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+      mAudioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
     }
     if (mAudioManager != null) {
       mSilentMode = (mAudioManager.getRingerMode() != AudioManager.RINGER_MODE_NORMAL);
     }
   }
 
-  private void playKeyClick(int primaryCode) {
+  protected void playKeyClick(int primaryCode) {
     // if mAudioManager is null, we don't have the ringer state yet
     // mAudioManager will be set by updateRingerMode
     if (mAudioManager == null) {
@@ -1010,7 +959,12 @@ public class LatinIME extends InputMethodService
         return;
       }
     }
-    if (mSoundOn && !mSilentMode) {
+    if (!mSilentMode)
+      playKeyClickPostMuteCheck(primaryCode);
+  }
+
+  protected void playKeyClickPostMuteCheck(int primaryCode) {
+    if (mSoundOn) {
       // FIXME: Volume and enable should come from UI settings
       // FIXME: These should be triggered after auto-repeat logic
       int sound = AudioManager.FX_KEYPRESS_STANDARD;
@@ -1039,36 +993,15 @@ public class LatinIME extends InputMethodService
     mVibrator.vibrate(mVibrateDuration);
   }
 
-  private void checkTutorial(String privateImeOptions) {
-    if (privateImeOptions == null) return;
-    if (privateImeOptions.equals("com.android.setupwizard:ShowTutorial")) {
-      if (mTutorial == null) startTutorial();
-    } else if (privateImeOptions.equals("com.android.setupwizard:HideTutorial")) {
-      if (mTutorial != null) {
-        if (mTutorial.close()) {
-          mTutorial = null;
-        }
-      }
-    }
-  }
-
-  private void startTutorial() {
-    mHandler.sendMessageDelayed(mHandler.obtainMessage(MSG_START_TUTORIAL), 500);
-  }
-
-  void tutorialDone() {
-    mTutorial = null;
-  }
-
   void promoteToUserDictionary(String word, int frequency) {
     if (mUserDictionary.isValidWord(word)) return;
     mUserDictionary.addWord(word, frequency);
   }
 
-  private void launchSettings() {
+  protected void launchSettings() {
     handleClose();
     Intent intent = new Intent();
-    intent.setClass(LatinIME.this, MorseIMESettings.class);
+    intent.setClass(LatinIME.this, MorseSettings.class);
     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
     startActivity(intent);
   }
@@ -1076,61 +1009,33 @@ public class LatinIME extends InputMethodService
   protected void loadSettings() {
     // Get the settings preferences
     SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-    mVibrateOn = sp.getBoolean(PREF_VIBRATE_ON, false);
-    mSoundOn = sp.getBoolean(PREF_SOUND_ON, false);
-    mAutoCap = sp.getBoolean(PREF_AUTO_CAP, true);
-    mQuickFixes = sp.getBoolean(PREF_QUICK_FIXES, true);
+    PrefUtil prefUtil = new PrefUtil(sp, getResources());
+    loadSettings(prefUtil);
+  }
+
+  protected void loadSettings(PrefUtil prefUtil) {
+    mVibrateOn = prefUtil.VIBRATE_ON.getValue();
+    mSoundOn = prefUtil.SOUND_ON.getValue();
+    mAutoCap = prefUtil.AUTO_CAP.getValue();
+    mQuickFixes = prefUtil.QUICK_FIXES.getValue();
     // If there is no auto text data, then quickfix is forced to "on", so that the other options
     // will continue to work
     if (AutoText.getSize(mInputView) < 1) mQuickFixes = true;
-    mShowSuggestions = sp.getBoolean(PREF_SHOW_SUGGESTIONS, true) & mQuickFixes;
-    boolean autoComplete = sp.getBoolean(PREF_AUTO_COMPLETE,
-        getResources().getBoolean(R.bool.enable_autocorrect)) & mShowSuggestions;
+    mShowSuggestions = prefUtil.SHOW_SUGGESTIONS.getValue() & mQuickFixes;
+    boolean autoComplete = prefUtil.AUTO_COMPLETE.getValue() & mShowSuggestions;
     mAutoCorrectOn = mSuggest != null && (autoComplete || mQuickFixes);
     mCorrectionMode = autoComplete
         ? Suggest.CORRECTION_FULL
         : (mQuickFixes ? Suggest.CORRECTION_BASIC : Suggest.CORRECTION_NONE);
   }
 
-  private void showOptionsMenu() {
-    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-    builder.setCancelable(true);
-    builder.setIcon(R.drawable.ic_dialog_keyboard);
-    builder.setNegativeButton(android.R.string.cancel, null);
-    CharSequence itemSettings = getString(R.string.morse_ime_settings);
-    CharSequence itemInputMethod = getString(R.string.inputMethod);
-    builder.setItems(new CharSequence[]{
-        itemSettings, itemInputMethod},
-        new DialogInterface.OnClickListener() {
-
-          public void onClick(DialogInterface di, int position) {
-            di.dismiss();
-            switch (position) {
-              case POS_SETTINGS:
-                launchSettings();
-                break;
-              case POS_METHOD:
-                ((InputMethodManager) getSystemService(INPUT_METHOD_SERVICE))
-                    .showInputMethodPicker();
-                break;
-            }
-          }
-        });
-    builder.setTitle(getResources().getString(R.string.morse_ime_name));
-    mOptionsDialog = builder.create();
-    Window window = mOptionsDialog.getWindow();
-    WindowManager.LayoutParams lp = window.getAttributes();
-    lp.token = mInputView.getWindowToken();
-    lp.type = WindowManager.LayoutParams.TYPE_APPLICATION_ATTACHED_DIALOG;
-    window.setAttributes(lp);
-    window.addFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
-    mOptionsDialog.show();
+  protected void showOptionsMenu() {
   }
 
   private void changeKeyboardMode() {
     mKeyboardSwitcher.toggleSymbols();
     if (mCapsLock && mKeyboardSwitcher.isAlphabetMode()) {
-      ((LatinKeyboard) mInputView.getKeyboard()).setShiftLocked(mCapsLock);
+      ((LatinKeyboard)mInputView.getKeyboard()).setShiftLocked(mCapsLock);
     }
 
     updateShiftKeyState(getCurrentInputEditorInfo());
@@ -1154,6 +1059,10 @@ public class LatinIME extends InputMethodService
     p.println("  TextEntryState.state=" + TextEntryState.getState());
     p.println("  mSoundOn=" + mSoundOn);
     p.println("  mVibrateOn=" + mVibrateOn);
+  }
+
+  protected MorseKeyboardView getInputView() {
+    return mInputView;
   }
 
   // Characters per second measurement

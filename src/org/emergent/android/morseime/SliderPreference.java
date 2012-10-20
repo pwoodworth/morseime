@@ -17,6 +17,7 @@
 package org.emergent.android.morseime;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.preference.DialogPreference;
 import android.util.AttributeSet;
@@ -41,16 +42,17 @@ public class SliderPreference extends DialogPreference
   private final String mSuffix;
   private final int mMin;
   private final int mMax;
+  private final int mInc;
   private final int mDefault;
 
 
-  private int mOldValue;
+  private int mPersistedValue;
 
 
   public SliderPreference(Context context, AttributeSet attrs) {
     super(context, attrs);
 
-    setDialogLayoutResource(R.layout.slider_pref);
+    setDialogLayoutResource(R.layout.sliderpref);
     setPositiveButtonText(android.R.string.ok);
     setNegativeButtonText(android.R.string.cancel);
 
@@ -59,21 +61,33 @@ public class SliderPreference extends DialogPreference
     setDialogIcon(null);
 
 
-//    mMin = 0;
     mMin = attrs.getAttributeIntValue(null, "min", 0);
-//    mMin = attrs.getAttributeIntValue(androidns, "min", 0);
+    mInc = attrs.getAttributeIntValue(null, "displayIncrement", 1);
     mMax = attrs.getAttributeIntValue(androidns, "max", 100);
     mSuffix = attrs.getAttributeValue(androidns, "text");
-    mDefault = attrs.getAttributeIntValue(androidns, "defaultValue", 0);
-
-    mOldValue = shouldPersist() ? getPersistedInt(mDefault) : mDefault;
-    setPrefValue(mOldValue);
+    mDefault = 0;
+    mPersistedValue = getPersistedInt(mDefault);
+    setPrefWidgets(getUnitized(mPersistedValue));
   }
 
   @Override
-  protected void onSetInitialValue(boolean restore, Object defaultValue) {
-    super.onSetInitialValue(restore, defaultValue);
-    setValueWidgets(getUnitized());
+  protected Object onGetDefaultValue(TypedArray a, int index) {
+    return a.getInt(index, 0);
+  }
+
+  @Override
+  protected void onSetInitialValue(boolean restorePersistedValue, Object defaultValue) {
+    int defInt = (defaultValue instanceof Integer) ? (Integer)defaultValue : mDefault;
+    LOG.error("onSetInitialValue: key = \"%s\" ; def = \"%s\" ; res = \"%s\"",
+        getKey(), defaultValue, restorePersistedValue);
+    if (restorePersistedValue) {
+      mPersistedValue = getPersistedInt(defInt);
+    } else {
+      mPersistedValue = defInt;
+      persistInt(mPersistedValue);
+    }
+    LOG.error("onSetInitialValue: key = \"%s\" ; out = \"%s\"", getKey(), mPersistedValue);
+    setPrefWidgets(getUnitized(mPersistedValue));
   }
 
   @Override
@@ -87,28 +101,28 @@ public class SliderPreference extends DialogPreference
       iconView.setVisibility(View.GONE);
     }
 
-    mValueText = (TextView) view.findViewById(R.id.seeklabel);
-    mSeekBar = getSeekBar(view);
+    mValueText = (TextView)view.findViewById(R.id.seeklabel);
+    mSeekBar = (SeekBar)view.findViewById(R.id.seekbar);
     mSeekBar.setMax(mMax - mMin);
-    mOldValue = shouldPersist() ? getPersistedInt(mDefault) : mDefault;
-    mSeekBar.setProgress(mOldValue - mMin);
+    mSeekBar.setProgress(convertPersistentToProgress(mPersistedValue));
+    setDialogWidgets(getUnitized(mPersistedValue));
     mSeekBar.setOnSeekBarChangeListener(this);
-    setPrefValue(mOldValue);
   }
 
   @Override
   protected void onDialogClosed(boolean positiveResult) {
-    super.onDialogClosed(positiveResult);
     if (positiveResult) {
-      if (shouldPersist())
-        persistInt(mSeekBar.getProgress() + mMin);
-    } else {
-      setPrefValue(mOldValue);
+      int newval = convertProgressToPersistent(mSeekBar.getProgress());
+      if (callChangeListener(newval)) {
+        if (persistInt(newval))
+          setPrefWidgets(getUnitized(newval));
+      }
     }
   }
 
   public void onProgressChanged(SeekBar seekBar, int progress, boolean fromTouch) {
-    setPrefValue(progress + mMin);
+    int toPersist = convertProgressToPersistent(progress);
+    setDialogWidgets(getUnitized(toPersist));
   }
 
   public void onStartTrackingTouch(SeekBar seekBar) {
@@ -117,28 +131,26 @@ public class SliderPreference extends DialogPreference
 
   public void onStopTrackingTouch(SeekBar seekBar) {
     // NA
-  }  
-
-  protected void setPrefValue(int value) {
-    setValueWidgets(getUnitized(value));
-    // If pref saved elsewhere set it here
   }
 
-  protected void setValueWidgets(String unitized) {
-    if (mValueText != null)
-      mValueText.setText(unitized);
+  private void setPrefWidgets(String unitized) {
     setSummary(unitized);
   }
 
-  protected String getUnitized() {
-    return getUnitized(getPersistedInt(mDefault));
+  private void setDialogWidgets(String unitized) {
+    if (mValueText != null)
+      mValueText.setText(unitized);
   }
 
   protected String getUnitized(int val) {
-    return val + (mSuffix != null ? mSuffix : "");
+    return (val * mInc) + (mSuffix != null ? mSuffix : "");
   }
 
-  protected static SeekBar getSeekBar(View dialogView) {
-    return (SeekBar) dialogView.findViewById(R.id.seekbar);
+  private int convertProgressToPersistent(int progress) {
+    return progress + mMin;
+  }
+
+  private int convertPersistentToProgress(int persistent) {
+    return persistent - mMin;
   }
 }

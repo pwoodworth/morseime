@@ -1,45 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <!--
-/*
-**
-** Copyright 2008, The Android Open Source Project
-**
-** Licensed under the Apache License, Version 2.0 (the "License");
-** you may not use this file except in compliance with the License.
-** You may obtain a copy of the License at
-**
-**     http://www.apache.org/licenses/LICENSE-2.0
-**
-** Unless required by applicable law or agreed to in writing, software
-** distributed under the License is distributed on an "AS IS" BASIS,
-** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-** See the License for the specific language governing permissions and
-** limitations under the License.
-*/
--->
+  ~ Copyright (c) 2010 Patrick Woodworth
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License"); you
+  ~ may not use this file except in compliance with the License. You may
+  ~ obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+  ~ implied. See the License for the specific language governing
+  ~ permissions and limitations under the License.
+  -->
+
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
-  <string name="app_name">Morse Code Keyboard</string>
-
-  <!-- Title for Latin keyboard  -->
-  <string name="morse_ime_name">Morse Code Keyboard</string>
-  <!-- Title for Latin keyboard settings activity / dialog -->
-  <string name="morse_ime_settings">Morse Code Keyboard settings</string>
-
-  <string name="help">Help</string>
-  <string name="help_summary">Reference &amp; instructions</string>
-
-  <!-- Option to automatically insert space between words -->
-  <string name="auto_space">Auto space</string>
-
-  <!-- Description for auto_space -->
-  <string name="auto_space_summary">Automatically insert space between words</string>
-
-  <!-- Option to force the keyboard visible even in landscape mode on phones with hard keyboard, etc. -->
-  <string name="force_visible">Force visible</string>
-
-  <!-- Description for force_visible -->
-  <string name="force_visible_summary">Show keyboard even when hard keyboard is available</string>
+  <!--
+  old stuff
+  -->
 
   <!-- Option to provide vibrate/haptic feedback on keypress -->
   <string name="vibrate_on_keypress">Vibrate on keypress</string>
@@ -213,8 +194,6 @@
   <string name="label_alpha_key">ABC</string>
   <!-- Label for ALT modifier key.  Must be short to fit on key! -->
   <string name="label_alt_key">ALT</string>
-  <!-- Label for "switch to morse" key.  Must be short to fit on key! -->
-  <string name="label_morse_key">&#8226; &#8212;</string>
 
   <!-- IME Tutorial screen (ROMAN) -->
   <skip/>
@@ -265,16 +244,87 @@
 
   <string name="inputMethod">Input method</string>
 
-  <string name="helptext">
-    Enabling:\n
-    \n
-    Go to your "Settings", "Language and keyboard" (or "Locale &amp; text"), enable "Morse Code Keyboard".
-    Ignore the pop-up warning, as Morse Code Keyboard is not a keylogger and does not track keystrokes or clicks.
-    The warning is from the Android operating system and occurs no matter which alternative keyboard you install.
-    \n
-    \n
-    Choose the Morse Code Keyboard by pressing and holding any input field, then press "Input Method", and select
-    "Morse Code Keyboard".  Hit your Back button to refresh if needed.
+
+  <!--
+  new stuff
+  -->
+
+  <string name="generic_instructions">Help</string>
+  <string name="generic_practice">Practice</string>
+  <string name="generic_reference">Reference</string>
+  <string name="generic_settings">Settings</string>
+
+
+
+  <string name="app_name">Morse Code Keyboard</string>
+
+  <!-- Title for Morse Code Keyboard  -->
+  <string name="morse_ime_name">Morse Code Keyboard</string>
+
+  <!-- Title for Morse Code Keyboard settings activity / dialog -->
+  <string name="morse_ime_settings">Morse Code Keyboard settings</string>
+
+  <string name="morse_practice_name">Morse Code Practice</string>
+
+  <string name="morse_practice_settings">Morse Code Practice settings</string>
+
+  <string name="morse_code_reference">Morse Code Reference</string>
+
+  <string name="morse_category">Morse Code settings</string>
+
+  <string name="misc_category">Miscellaneous settings</string>
+
+  <!-- Option to automatically insert space between words -->
+  <string name="auto_space">Auto space</string>
+
+  <!-- Description for auto_space -->
+  <string name="auto_space_summary">Automatically insert space between words</string>
+
+  <!-- Option to force the keyboard visible even in landscape mode on phones with hard keyboard, etc. -->
+  <string name="force_visible">Force visible</string>
+
+  <!-- Description for force_visible -->
+  <string name="force_visible_summary">Show keyboard even when hard keyboard is available</string>
+
+  <!-- Label for "switch to morse" key.  Must be short to fit on key! -->
+  <string name="label_morse_key">&#8226; &#8212;</string>
+
+  <string name="practice_settings">Practice Settings</string>
+
+
+  <string name="Language_n_keyboard">Language&#xA0;&amp;&#xA0;keyboard</string>
+
+
+  <string name="help">Help</string>
+
+  <string name="help_summary">Reference &amp; instructions</string>
+
+  <string name="help_language_and_keyboard_settings_link_text">Language&#xA0;&amp;&#xA0;keyboard</string>
+
+  <string name="help_input_method_link_text">Input&#xA0;Method</string>
+
+  <string name="help_enable_keyboard_text">
+To enable the <b>Morse Code Keyboard</b>, open the <b><i>Settings</i></b> application, navigate to the
+<b><i>Language&#xA0;&amp;&#xA0;keyboard</i></b> (or <b><i>Locale&#xA0;&amp;&#xA0;text</i></b>) submenu, then click the
+checkbox next to <b><i>Morse&#xA0;Code&#xA0;Keyboard</i></b>.\n
   </string>
+
+  <string name="help_keylogger_warning_text">
+NOTE: Ignore the pop-up warning, as <b>Morse Code Keyboard</b> is not a keylogger and does not track keystrokes or clicks.
+The warning is from the Android operating system and occurs no matter which alternative keyboard you install.
+  </string>
+
+
+  <string name="help_select_input_method_text">
+Now that it\'s been enabled, you can activate the <b>Morse Code Keyboard</b> by pressing and holding any input field,
+then press <b><i>Input&#xA0;Method</i></b>.
+  </string>
+
+  <string name="help_select_input_method_item_text">
+Select <b><i>Morse&#xA0;Code&#xA0;Keyboard</i></b>.  Hit your Back button to refresh if needed.
+  </string>
+
+
+  <string name="ref_card_link_uri">http://en.m.wikipedia.org/wiki/Morse_code#section_5</string>
 
 </resources>

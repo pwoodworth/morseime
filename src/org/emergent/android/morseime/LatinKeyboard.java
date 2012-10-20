@@ -1,12 +1,12 @@
 /*
  * Copyright (C) 2008-2009 Google Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -52,20 +52,21 @@ public class LatinKeyboard extends Keyboard {
     mShiftLockPreviewIcon.setBounds(0, 0,
         mShiftLockPreviewIcon.getIntrinsicWidth(),
         mShiftLockPreviewIcon.getIntrinsicHeight());
-    sSpacebarVerticalCorrection = res.getDimensionPixelOffset(
-        R.dimen.spacebar_vertical_correction);
+    sSpacebarVerticalCorrection = res.getDimensionPixelOffset(R.dimen.spacebar_vertical_correction);
   }
 
-  public LatinKeyboard(Context context, int layoutTemplateResId,
-                       CharSequence characters, int columns, int horizontalPadding) {
+  public LatinKeyboard(Context context,
+                       int layoutTemplateResId,
+                       CharSequence characters,
+                       int columns,
+                       int horizontalPadding) {
     super(context, layoutTemplateResId, characters, columns, horizontalPadding);
   }
 
   @Override
-  protected Key createKeyFromXml(Resources res, Row parent, int x, int y,
-                                 XmlResourceParser parser) {
+  protected Key createKeyFromXml(Resources res, Row parent, int x, int y, XmlResourceParser parser) {
     Key key = new LatinKey(res, parent, x, y, parser);
-    if (key.codes[0] == 10) {
+    if (key.codes[0] == Constants.KEYCODE_ENTER) {
       mEnterKey = key;
     }
     return key;
@@ -113,10 +114,8 @@ public class LatinKeyboard extends Keyboard {
             mEnterKey.text = ":-) ";
             mEnterKey.popupResId = R.xml.popup_smileys;
           } else {
-            mEnterKey.iconPreview = res.getDrawable(
-                R.drawable.sym_keyboard_feedback_return);
-            mEnterKey.icon = res.getDrawable(
-                R.drawable.sym_keyboard_return);
+            mEnterKey.iconPreview = res.getDrawable(R.drawable.sym_keyboard_feedback_return);
+            mEnterKey.icon = res.getDrawable(R.drawable.sym_keyboard_return);
             mEnterKey.label = null;
           }
           break;
@@ -195,8 +194,7 @@ public class LatinKeyboard extends Keyboard {
 
     private boolean mShiftLockEnabled;
 
-    public LatinKey(Resources res, Keyboard.Row parent, int x, int y,
-                    XmlResourceParser parser) {
+    public LatinKey(Resources res, Keyboard.Row parent, int x, int y, XmlResourceParser parser) {
       super(res, parent, x, y, parser);
       if (popupCharacters != null && popupCharacters.length() == 0) {
         // If there is a keyboard with no keys specified in popupCharacters

@@ -1,0 +1,8 @@
+convert -crop '500x210>!+0+155' morseime29.png input_method_menu_example.png
+convert -crop '500x210>!+0+155' morseime28.png keyboard_enable_checkbox_example.png
+convert -crop '500x210>!+0+155' morseime17.png input_method_item_example.png
+
+convert -scale '50%' morseime29.png input_method_menu_example.png
+convert -scale '50%' morseime28.png keyboard_enable_checkbox_example.png
+convert -scale '50%' morseime17.png input_method_item_example.png
+convert -scale '50%' morseime02.png keylogger_warning_example.png

@@ -17,43 +17,109 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="fill_parent"
-              android:layout_height="wrap_content"
               android:orientation="vertical"
-              android:gravity="center_horizontal">
-
-  <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="fill_parent"
-              android:layout_height="wrap_content"
+              android:layout_height="fill_parent"
+              android:background="@color/help_background"
+    >
+
+  <ScrollView
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content"
       >
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                  android:layout_width="fill_parent"
-                  android:layout_height="wrap_content"
-                  android:orientation="vertical"
-                  android:scrollbars="vertical"
-                  android:scrollbarAlwaysDrawVerticalTrack="true"
-                  android:gravity="center_horizontal"
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:scrollbars="vertical"
+        android:scrollbarAlwaysDrawVerticalTrack="true"
+        android:gravity="center_horizontal"
         >
 
-      <ImageView xmlns:android="http://schemas.android.com/apk/res/android"
-                 android:layout_width="fill_parent"
-                 android:layout_height="wrap_content"
-                 android:src="@drawable/morseref"
-                 android:padding="@dimen/spacebar_vertical_correction"
-                 android:scaleType="fitXY"
+      <Button
+          android:id="@+id/practicebutton"
+          android:text="Practice"
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"
           />
 
-      <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/helptext"
+
+      <TextView
+          android:id="@+id/help_enable_keyboard_textview"
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"
+          android:text="@string/help_enable_keyboard_text"
+          android:padding="5dip"
+          android:textColor="@color/help_text_color"
           />
+
+      <ImageView
+          android:id="@+id/help_enable_keyboard_imageview"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:scaleType="centerInside"
+          android:src="@drawable/keyboard_enable_checkbox_example"
+          android:padding="25dip"
+          />
+
+      <TextView
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"
+          android:text="@string/help_keylogger_warning_text"
+          android:padding="5dip"
+          android:textColor="@color/help_text_color"
+          />
+
+      <ImageView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:scaleType="centerInside"
+          android:src="@drawable/keylogger_warning_example"
+          android:padding="25dip"
+          />
+
+
+
+      <TextView
+          android:id="@+id/help_select_input_method_textview"
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"
+          android:text="@string/help_select_input_method_text"
+          android:padding="5dip"
+          android:textColor="@color/help_text_color"
+          />
+
+      <ImageView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:scaleType="centerInside"
+          android:src="@drawable/input_method_item_example"
+          android:padding="25dip"
+          />
+
+
+      <TextView
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"
+          android:text="@string/help_select_input_method_item_text"
+          android:padding="5dip"
+          android:textColor="@color/help_text_color"
+          />
+
+
+      <ImageView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:scaleType="centerInside"
+          android:src="@drawable/input_method_menu_example"
+          android:padding="25dip"
+          />
+
 
     </LinearLayout>
 
-
   </ScrollView>
 
-
 </LinearLayout>
+

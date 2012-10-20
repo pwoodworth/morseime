@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-
 <!--
   ~ Copyright (c) 2010 Patrick Woodworth
   ~
@@ -21,58 +20,72 @@
                   android:title="@string/morse_ime_settings"
                   android:key="morse_ime_settings">
 
-  <org.emergent.android.morseime.HelpPreference
-      android:key="foo_bar"
-      android:title="@string/help"
-      android:summary="@string/help_summary"
-      android:persistent="false"
-      />
+  <PreferenceCategory
+      android:title="@string/morse_category"
+      android:key="morse_category">
 
-  <org.emergent.android.morseime.SliderPreference
-      android:key="words_per_minute"
-      android:title="Words Per Minute"
-      android:summary="foo"
-      android:dialogMessage="Words per minute"
-      android:defaultValue="10"
-      android:text="wpm"
-      android:max="50"
-      android:persistent="true"
-      min="1"
-      />
+    <org.emergent.android.morseime.SliderPreference
+        android:key="words_per_minute"
+        android:title="Words Per Minute"
+        android:summary="foo"
+        android:dialogMessage="Words per minute"
+        android:defaultValue="10"
+        android:text="wpm"
+        android:max="50"
+        android:persistent="true"
+        min="1"
+        />
 
-  <CheckBoxPreference
-      android:key="auto_space_on"
-      android:title="@string/auto_space"
-      android:summary="@string/auto_space_summary"
-      android:persistent="true"
-      />
+    <CheckBoxPreference
+        android:key="auto_space_on"
+        android:title="@string/auto_space"
+        android:summary="@string/auto_space_summary"
+        android:persistent="true"
+        />
 
-  <CheckBoxPreference
-      android:key="force_visible"
-      android:title="@string/force_visible"
-      android:summary="@string/force_visible_summary"
-      android:persistent="true"
-      android:defaultValue="true"
-      />
+    <CheckBoxPreference
+        android:key="force_visible"
+        android:title="@string/force_visible"
+        android:summary="@string/force_visible_summary"
+        android:persistent="true"
+        android:defaultValue="true"
+        />
 
-  <CheckBoxPreference
-      android:key="vibrate_on"
-      android:title="@string/vibrate_on_keypress"
-      android:persistent="true"
-      />
+    <org.emergent.android.morseime.SliderPreference
+        android:key="beep_volume"
+        android:title="Beep Volume"
+        android:dialogMessage="Beep volume"
+        android:defaultValue="0"
+        android:text="%"
+        android:persistent="true"
+        />
 
-  <CheckBoxPreference
-      android:key="sound_on"
-      android:title="@string/sound_on_keypress"
-      android:persistent="true"
-      />
+  </PreferenceCategory>
 
-  <CheckBoxPreference
-      android:key="auto_cap"
-      android:title="@string/auto_cap"
-      android:persistent="true"
-      android:defaultValue="true"
-      />
+  <PreferenceCategory
+      android:title="@string/misc_category"
+      android:key="misc_category">
+
+    <CheckBoxPreference
+        android:key="vibrate_on"
+        android:title="@string/vibrate_on_keypress"
+        android:persistent="true"
+        />
+
+    <CheckBoxPreference
+        android:key="sound_on"
+        android:title="@string/sound_on_keypress"
+        android:persistent="true"
+        />
+
+    <CheckBoxPreference
+        android:key="auto_cap"
+        android:title="@string/auto_cap"
+        android:persistent="true"
+        android:defaultValue="true"
+        />
+
+  </PreferenceCategory>
 
   <PreferenceCategory
       android:title="@string/prediction_category"

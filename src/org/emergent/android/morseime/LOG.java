@@ -23,9 +23,9 @@ import android.util.Log;
  */
 class LOG {
 
-  public static final boolean LOGGING_ENABLED = false;
+  public static final boolean LOGGING_ENABLED = true;
 
-  private static final String LOGGING_CATEGORY = "MORSEKB";
+  private static final String LOGGING_CATEGORY = "MORSEIME";
 
   public static void debug(String msg) {
     if (LOGGING_ENABLED)

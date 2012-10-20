@@ -1,71 +1,116 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="morseime" basedir="." default="help">
 
-    <!-- The local.properties file is created and updated by the 'android' tool.
-         It contains the path to the SDK. It should *NOT* be checked in in Version
-         Control Systems. -->
-    <property file="local.properties" />
+  <dirname property="morseime.dir" file="${ant.file.morseime}"/>
 
-    <property file="${user.home}/.android/local.properties" />
+  <!-- The local.properties file is created and updated by the 'android' tool.
+It contains the path to the SDK. It should *NOT* be checked in in Version
+Control Systems. -->
+  <property file="local.properties"/>
 
-    <!-- The build.properties file can be created by you and is never touched
-         by the 'android' tool. This is the place to change some of the default property values
-         used by the Ant rules.
-         Here are some properties you may want to change/update:
+  <property file="${user.home}/.android/local.properties"/>
 
-         application.package
-             the name of your application package as defined in the manifest. Used by the
-             'uninstall' rule.
-         source.dir
-             the name of the source directory. Default is 'src'.
-         out.dir
-             the name of the output directory. Default is 'bin'.
+  <!-- The build.properties file can be created by you and is never touched
+  by the 'android' tool. This is the place to change some of the default property values
+  used by the Ant rules.
+  Here are some properties you may want to change/update:
 
-         Properties related to the SDK location or the project target should be updated
-          using the 'android' tool with the 'update' action.
+  application.package
+      the name of your application package as defined in the manifest. Used by the
+      'uninstall' rule.
+  source.dir
+      the name of the source directory. Default is 'src'.
+  out.dir
+      the name of the output directory. Default is 'bin'.
 
-         This file is an integral part of the build system for your application and
-         should be checked in in Version Control Systems.
+  Properties related to the SDK location or the project target should be updated
+   using the 'android' tool with the 'update' action.
 
-         -->
-    <property file="build.properties" />
+  This file is an integral part of the build system for your application and
+  should be checked in in Version Control Systems.
 
-    <!-- The default.properties file is created and updated by the 'android' tool, as well
-         as ADT.
-         This file is an integral part of the build system for your application and
-         should be checked in in Version Control Systems. -->
-    <property file="default.properties" />
+  -->
+  <property file="build.properties"/>
 
-    <!-- Custom Android task to deal with the project target, and import the proper rules.
-         This requires ant 1.6.0 or above. -->
-    <path id="android.antlibs">
-        <pathelement path="${sdk.dir}/tools/lib/anttasks.jar" />
-        <pathelement path="${sdk.dir}/tools/lib/sdklib.jar" />
-        <pathelement path="${sdk.dir}/tools/lib/androidprefs.jar" />
-        <pathelement path="${sdk.dir}/tools/lib/apkbuilder.jar" />
-        <pathelement path="${sdk.dir}/tools/lib/jarutils.jar" />
-    </path>
+  <!-- The default.properties file is created and updated by the 'android' tool, as wellas ADT.
+This file is an integral part of the build system for your application and
+should be checked in in Version Control Systems. -->
+  <property file="default.properties"/>
 
-    <taskdef name="setup"
-        classname="com.android.ant.SetupTask"
-        classpathref="android.antlibs" />
+  <!-- Custom Android task to deal with the project target, and import the proper rules.
+This requires ant 1.6.0 or above. -->
+  <path id="android.antlibs">
+    <pathelement path="${sdk.dir}/tools/lib/anttasks.jar"/>
+    <pathelement path="${sdk.dir}/tools/lib/sdklib.jar"/>
+    <pathelement path="${sdk.dir}/tools/lib/androidprefs.jar"/>
+    <pathelement path="${sdk.dir}/tools/lib/apkbuilder.jar"/>
+    <pathelement path="${sdk.dir}/tools/lib/jarutils.jar"/>
+  </path>
 
-    <!-- Execute the Android Setup task that will setup some properties specific to the target,
-         and import the build rules files.
+  <taskdef name="setup"
+           classname="com.android.ant.SetupTask"
+           classpathref="android.antlibs"/>
 
-         The rules file is imported from
-            <SDK>/platforms/<target_platform>/templates/android_rules.xml
+  <!-- Execute the Android Setup task that will setup some properties specific to the target,
+       and import the build rules files.
 
-         To customize some build steps for your project:
-         - copy the content of the main node <project> from android_rules.xml
-         - paste it in this build.xml below the <setup /> task.
-         - disable the import by changing the setup task below to <setup import="false" />
+       The rules file is imported from
+          <SDK>/platforms/<target_platform>/templates/android_rules.xml
 
-         This will ensure that the properties are setup correctly but that your customized
-         build steps are used.
-    -->
-    <setup />
+       To customize some build steps for your project:
+       - copy the content of the main node <project> from android_rules.xml
+       - paste it in this build.xml below the <setup /> task.
+       - disable the import by changing the setup task below to <setup import="false" />
+
+       This will ensure that the properties are setup correctly but that your customized
+       build steps are used.
+  -->
 
   <setup/>
+
+  <macrodef name="m-toandfro">
+    <attribute name="dir"/>
+    <element name="copy-elements" optional="true"/>
+    <element name="pattern-elements" optional="true"/>
+    <sequential>
+      <delete dir="${java.io.tmpdir}/toandfro" quiet="true"/>
+      <copy todir="${java.io.tmpdir}/toandfro" overwrite="true" preservelastmodified="false">
+        <fileset dir="@{dir}">
+          <pattern-elements/>
+        </fileset>
+        <copy-elements/>
+      </copy>
+      <fixcrlf srcdir="${java.io.tmpdir}/toandfro" fixlast="true" eol="unix">
+        <patternset>
+          <include name="**"/>
+        </patternset>
+      </fixcrlf>
+      <copy todir="@{dir}" overwrite="true" preservelastmodified="false">
+        <fileset dir="${java.io.tmpdir}/toandfro"/>
+        <filterchain>
+          <tokenfilter>
+            <replaceregex pattern="\s+$" replace="" flags="gi"/>
+          </tokenfilter>
+        </filterchain>
+      </copy>
+    </sequential>
+  </macrodef>
+
+  <target name="fixws">
+    <m-toandfro dir="${morseime.dir}">
+      <pattern-elements>
+        <include name="src/**/*.java"/>
+      </pattern-elements>
+<!--
+      <copy-elements>
+        <filterchain>
+          <tokenfilter>
+            <replacestring from="foo.bar" to="foo.baz"/>
+          </tokenfilter>
+        </filterchain>
+      </copy-elements>
+-->
+    </m-toandfro>
+  </target>
 
 </project>

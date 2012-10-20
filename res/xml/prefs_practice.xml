@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright (c) 2010 Patrick Woodworth
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License"); you
+  ~ may not use this file except in compliance with the License. You may
+  ~ obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+  ~ implied. See the License for the specific language governing
+  ~ permissions and limitations under the License.
+  -->
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:title="@string/morse_practice_settings"
+                  android:key="morse_practice_settings">
+
+  <PreferenceScreen
+          android:title="@string/morse_ime_settings"
+          >
+
+      <intent android:action="android.intent.action.MAIN"
+              android:targetPackage="org.emergent.android.morseime"
+              android:targetClass="org.emergent.android.morseime.MorseSettings"
+          />
+
+  </PreferenceScreen>
+
+
+  <org.emergent.android.morseime.SliderPreference
+      android:key="practice_answer_timeout"
+      android:title="Answer Timeout"
+      android:summary="foo"
+      android:dialogMessage="Answer display milliseconds"
+      android:defaultValue="40"
+      android:text="ms"
+      android:max="100"
+      displayIncrement="100"
+      />
+
+<!--
+  <org.emergent.android.morseime.SliderPreference
+      android:key="practice_word_length_max"
+      android:title="Maximum Word Length"
+      android:dialogMessage="Maximum word length"
+      android:defaultValue="1"
+      android:text="characters"
+      android:max="5"
+      min="1"
+      />
+-->
+
+  <CheckBoxPreference
+      android:key="practice_letters_1_on"
+      android:title="1 Keypress Letters"
+      android:persistent="true"
+      android:defaultValue="true"
+      />
+
+  <CheckBoxPreference
+      android:key="practice_letters_2_on"
+      android:title="2 Keypress Letters"
+      android:persistent="true"
+      android:defaultValue="true"
+      />
+
+  <CheckBoxPreference
+      android:key="practice_letters_3_on"
+      android:title="3 Keypress Letters"
+      android:persistent="true"
+      android:defaultValue="true"
+      />
+
+  <CheckBoxPreference
+      android:key="practice_letters_4_on"
+      android:title="4 Keypress Letters"
+      android:persistent="true"
+      android:defaultValue="true"
+      />
+
+  <CheckBoxPreference
+      android:key="practice_digits_on"
+      android:title="Digits"
+      android:persistent="true"
+      android:defaultValue="true"
+      />
+
+  <CheckBoxPreference
+      android:key="practice_symbols_on"
+      android:title="Symbols"
+      android:persistent="true"
+      android:defaultValue="true"
+      />
+
+</PreferenceScreen>

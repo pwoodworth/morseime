@@ -16,32 +16,43 @@
 
 package org.emergent.android.morseime;
 
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.media.AudioManager;
+import android.media.ToneGenerator;
+import android.view.KeyEvent;
+import android.view.Window;
+import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 
 /**
  * @author Patrick Woodworth
  */
 public class MorseIME extends LatinIME {
 
-  private static final String PREF_WORDS_PER_MINUTE = "words_per_minute";
-  private static final String PREF_AUTO_SPACE_ON = "auto_space_on";
-  private static final String PREF_FORCE_VISIBLE = "force_visible";
-
-  private static final int WPM_MILLIS_EQUATION_NUMERATOR = 1200;
-  private static final int CHAR_SEP_UNITS = 3;
-  private static final int WORD_SEP_UNITS = 7;
-  private static final int DEFAULT_WPM = 10;
-
   private DitDahHandlerCallback m_ditDahHandlerCallback = new DitDahHandlerCallback();
 
+  private boolean mDirectMode = false;
   private boolean m_forceVisible = true;
   private boolean m_autoSpace = false;
-  private long m_wpm = 10;
+  private int m_wpm = 10;
+
+  private ToneGenerator mToneGenerator;
 
   @Override
   public boolean onEvaluateInputViewShown() {
     return m_forceVisible || super.onEvaluateInputViewShown();
+  }
+
+  @Override
+  public void onStartInputView(EditorInfo attribute, boolean restarting) {
+    super.onStartInputView(attribute, restarting);
+    if ("org.emergent.android.morseime:DIRECT".equals(attribute.privateImeOptions)) {
+      mDirectMode = true;
+    } else {
+      mDirectMode = false;
+    }
   }
 
   @Override
@@ -52,22 +63,120 @@ public class MorseIME extends LatinIME {
 
   @Override
   public void onKey(int primaryCode, int[] keyCodes) {
-    if (m_ditDahHandlerCallback.handleKeyPress(primaryCode))
-      return;
-    else
-      super.onKey(primaryCode, keyCodes);
+    if (primaryCode == Constants.KEYCODE_DIT || primaryCode == Constants.KEYCODE_DAH) {
+      m_ditDahHandlerCallback.recordDitOrDah(primaryCode == Constants.KEYCODE_DIT);
+      if (mDirectMode) {
+        primaryCode = primaryCode == Constants.KEYCODE_DIT ? Constants.KEYCODE_DIRECT_DIT : Constants.KEYCODE_DIRECT_DAH;
+      } else {
+        return;
+      }
+    } else {
+      m_ditDahHandlerCallback.reset();
+    }
+    super.onKey(primaryCode, keyCodes);
+  }
+
+  protected void playKeyClickPostMuteCheck(int primaryCode) {
+    long toneDuration = 0;
+    switch (primaryCode) {
+      case Constants.KEYCODE_DIT:
+        toneDuration = MorseUtil.calcDitMillis(m_wpm);
+        break;
+      case Constants.KEYCODE_DAH:
+        toneDuration = MorseUtil.calcDahMillis(m_wpm);
+        break;
+      default:
+        super.playKeyClickPostMuteCheck(primaryCode);
+        return;
+    }
+    if (toneDuration > 0 && mToneGenerator != null)
+        mToneGenerator.startTone(ToneGenerator.TONE_DTMF_5, (int)toneDuration);
   }
 
   @Override
-  protected void loadSettings() {
-    super.loadSettings();
-    // Get the settings preferences
-    SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-    m_forceVisible = sp.getBoolean(PREF_FORCE_VISIBLE, true);
-    m_autoSpace = sp.getBoolean(PREF_AUTO_SPACE_ON, false);
-    m_wpm = sp.getInt(PREF_WORDS_PER_MINUTE, DEFAULT_WPM);
+  protected void loadSettings(PrefUtil sp) {
+    super.loadSettings(sp);
+    m_forceVisible = sp.FORCE_VISIBLE.getValue();
+    m_autoSpace = sp.AUTO_SPACE_ON.getValue();
+    m_wpm = sp.WORDS_PER_MINUTE.getValue();
+    try {
+      int beepVolume = sp.BEEP_VOLUME.getValue();
+      mToneGenerator = beepVolume <= 0
+          ? null
+          : new ToneGenerator(AudioManager.STREAM_SYSTEM,beepVolume);
+    } catch (Throwable e) {
+      LOG.error(e, "failed to instantiate tone generator");
+    }
   }
 
+  protected void showOptionsMenu() {
+    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    builder.setCancelable(true);
+    builder.setIcon(R.drawable.ic_dialog_keyboard);
+    builder.setNegativeButton(android.R.string.cancel, null);
+    builder.setItems(new CharSequence[]{
+        getString(R.string.morse_code_reference),
+        getString(R.string.morse_ime_settings),
+        getString(R.string.inputMethod),
+    },
+        new DialogInterface.OnClickListener() {
+          public void onClick(DialogInterface di, int position) {
+            di.dismiss();
+            switch (position) {
+              case 0:
+                showRefCard();
+                break;
+              case 1:
+                launchSettings();
+                break;
+              case 2:
+                ((InputMethodManager)getSystemService(INPUT_METHOD_SERVICE)).showInputMethodPicker();
+                break;
+            }
+          }
+        });
+    builder.setTitle(getResources().getString(R.string.morse_ime_name));
+    mOptionsDialog = builder.create();
+    Window window = mOptionsDialog.getWindow();
+    WindowManager.LayoutParams lp = window.getAttributes();
+    lp.token = getInputView().getWindowToken();
+    lp.type = WindowManager.LayoutParams.TYPE_APPLICATION_ATTACHED_DIALOG;
+    window.setAttributes(lp);
+    window.addFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+    mOptionsDialog.show();
+  }
+
+  private void showRefCard() {
+    MorseUtil.showRefCard(this, getInputView());
+  }
+
+  /**
+   * Helper to send a key down / key up pair to the current editor.
+   * @param keyEventCode the key code
+   */
+  private void keyDownUp(int keyEventCode) {
+    getCurrentInputConnection().sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, keyEventCode));
+    getCurrentInputConnection().sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, keyEventCode));
+  }
+
+  /**
+   * Helper to send a character to the editor as raw key events.
+   * @param keyCode the key code
+   */
+  private void sendKey(int keyCode) {
+    switch (keyCode) {
+      case '\n':
+        keyDownUp(KeyEvent.KEYCODE_ENTER);
+        break;
+      default:
+        if (keyCode >= '0' && keyCode <= '9') {
+          keyDownUp(keyCode - '0' + KeyEvent.KEYCODE_0);
+        } else {
+          getCurrentInputConnection().commitText(String.valueOf((char) keyCode), 1);
+        }
+        break;
+    }
+  }
 
   public class DitDahHandlerCallback implements Runnable {
 
@@ -85,42 +194,36 @@ public class MorseIME extends LatinIME {
       try {
         synchronized (m_ditDahBuf) {
           long elapsed = curTime - m_lastDitOrDah;
-          if (elapsed < calcMillis(CHAR_SEP_UNITS))
+          if (elapsed < MorseUtil.calcCharSepMillis(m_wpm))
             return;
 
           if (m_ditDahBuf.length() == 0) {
-            if (!m_autoSpace || m_lastDitOrDah == 0 || elapsed < calcMillis(WORD_SEP_UNITS))
+            if (m_lastDitOrDah == 0)
+              return;
+            if (!m_autoSpace || elapsed < MorseUtil.calcWordSepMillis(m_wpm))
               return;
             m_lastDitOrDah = 0;
-            getCurrentInputConnection().commitText(String.valueOf((char) ' '), 1);
-//            sendKey(' ');
+            sendKey(mDirectMode ? '\n' : ' ');
           } else {
             String encoding = m_ditDahBuf.toString();
             m_ditDahBuf.setLength(0);
-            try {
-              MorseDigraph digraph = MorseDigraph.valueOfEncoding(encoding);
-              char theChar = digraph.getChar();
-              if (mKeyboardSwitcher.mInputView.getKeyboard().isShifted())
-                theChar = Character.toUpperCase(theChar);
-              getCurrentInputConnection().commitText(String.valueOf(theChar), 1);
-//              sendKey(digraph.getChar());
-            } catch (IllegalArgumentException e) {
-              LOG.warn(e, e.getMessage());
+            if (mDirectMode) {
+              sendKey('\n');
+            } else {
+              try {
+                MorseDigraph digraph = MorseDigraph.valueOfEncoding(encoding);
+                char theChar = digraph.getChar();
+                if (mKeyboardSwitcher.mInputView.getKeyboard().isShifted())
+                  theChar = Character.toUpperCase(theChar);
+                sendKey(theChar);
+              } catch (IllegalArgumentException e) {
+                LOG.warn(e, e.getMessage());
+              }
             }
           }
         }
       } finally {
-        mHandler.postDelayed(this, 200);
-      }
-    }
-
-    public boolean handleKeyPress(int primaryCode) {
-      if (primaryCode == MorseKeyboardView.KEYCODE_DIT || primaryCode == MorseKeyboardView.KEYCODE_DAH) {
-        m_ditDahHandlerCallback.recordDitOrDah(primaryCode == MorseKeyboardView.KEYCODE_DIT);
-        return true;
-      } else {
-        m_ditDahHandlerCallback.reset();
-        return false;
+        mHandler.postDelayed(this, Constants.LOOP_MILLIS);
       }
     }
 
@@ -133,20 +236,16 @@ public class MorseIME extends LatinIME {
       }
     }
 
-    private void recordDitOrDah(boolean isDit) {
+    public void recordDitOrDah(boolean isDit) {
       synchronized (m_ditDahBuf) {
         m_lastDitOrDah = System.currentTimeMillis();
         m_ditDahBuf.append(isDit ? '.' : '-');
         if (!m_registered) {
           mHandler.removeCallbacks(this);
-          mHandler.postDelayed(this, 200);
+          mHandler.postDelayed(this, Constants.LOOP_MILLIS);
           m_registered = true;
         }
       }
-    }
-
-    private long calcMillis(int units) {
-      return (WPM_MILLIS_EQUATION_NUMERATOR * units) / m_wpm;
     }
   }
 }

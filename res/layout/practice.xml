@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright (c) 2010 Patrick Woodworth
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License"); you
+  ~ may not use this file except in compliance with the License. You may
+  ~ obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+  ~ implied. See the License for the specific language governing
+  ~ permissions and limitations under the License.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:background="#ffffff">
+
+  <Button
+      android:text="Reset"
+      android:id="@+id/resetbutton"
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content"
+      />
+  
+  <TextView
+      android:id="@+id/questiontext"
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content"
+      android:textColor="#000000"
+      android:text=""
+      android:textSize="36dp"
+      android:gravity="center_horizontal"
+      />
+
+  <TextView
+      android:id="@+id/answertext"
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content"
+      android:textColor="#000000"
+      android:text=""
+      android:textSize="24dp"
+      android:gravity="center_horizontal"
+      />
+
+  <TextView
+      android:id="@+id/scoretext"
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content"
+      android:textColor="#000000"
+      android:text="Score: 0/0"
+      android:textSize="24dp"
+      android:gravity="center_horizontal"
+      />
+
+  <EditText
+      android:id="@+id/answeredit"
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content"
+      android:maxLines="1"
+      android:privateImeOptions="org.emergent.android.morseime:DIRECT"
+      />
+
+  <!--
+    <SeekBar android:id="@+id/speedbar"
+             android:layout_width="fill_parent"
+             android:layout_height="wrap_content"
+             android:padding="20dip"
+             android:gravity="bottom"
+             android:max="158"
+             android:progress="78"
+        />
+  -->
+
+</LinearLayout>

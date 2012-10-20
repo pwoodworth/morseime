@@ -16,13 +16,13 @@
 
 package org.emergent.android.morseime;
 
-import java.util.Locale;
-
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.provider.UserDictionary.Words;
+
+import java.util.Locale;
 
 public class UserDictionary extends ExpandableDictionary {
 

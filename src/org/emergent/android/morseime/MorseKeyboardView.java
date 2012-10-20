@@ -22,6 +22,7 @@ import android.inputmethodservice.Keyboard;
 import android.inputmethodservice.Keyboard.Key;
 import android.inputmethodservice.KeyboardView;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 
 /**
  * @author Patrick Woodworth
@@ -30,8 +31,6 @@ public class MorseKeyboardView extends KeyboardView {
 
   static final int KEYCODE_OPTIONS = -100;
   static final int KEYCODE_SHIFT_LONGPRESS = -101;
-  static final int KEYCODE_DIT = -102;
-  static final int KEYCODE_DAH = -103;
 
   private Keyboard mPhoneKeyboard;
 
@@ -45,6 +44,42 @@ public class MorseKeyboardView extends KeyboardView {
 
   public void setPhoneKeyboard(Keyboard phoneKeyboard) {
     mPhoneKeyboard = phoneKeyboard;
+  }
+
+  private LastKey mLastKey = LastKey.NOKEY;
+
+  @Override
+  public boolean onTouchEvent(MotionEvent me) {
+    String actionName = "UNKOWN";
+    switch (me.getAction()) {
+      case MotionEvent.ACTION_UP:
+        actionName = "UP";
+        break;
+      case MotionEvent.ACTION_DOWN:
+        actionName = "DOWN";
+        break;
+      case MotionEvent.ACTION_MOVE:
+        actionName = "MOVE";
+        break;
+    }
+    String keyName = "none";
+    for (Key key : getKeyboard().getKeys()) {
+      if (key.isInside((int)me.getX(), (int)me.getY())) {
+        keyName = "" + key.codes[0];
+        LastKey newKey = LastKey.NOKEY;
+        if (key.codes[0] == -102) {
+          newKey = LastKey.DITKEY;
+        } else if (key.codes[0] == -103) {
+          newKey = LastKey.DAHKEY;
+        }
+        if (newKey != mLastKey) {
+          LOG.debug("MorseKeyboardView.onTouchEvent : theval = %s ; x = %s ; y = %s ; key = %s",
+              actionName, me.getX(), me.getY(), keyName );
+          mLastKey = newKey;
+        }
+      }
+    }
+    return super.onTouchEvent(me);
   }
 
   @Override
@@ -63,5 +98,12 @@ public class MorseKeyboardView extends KeyboardView {
     } else {
       return super.onLongPress(key);
     }
+  }
+
+  enum LastKey {
+    NOKEY,
+    DITKEY,
+    DAHKEY,
+    ;
   }
 }
